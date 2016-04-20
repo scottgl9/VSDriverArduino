@@ -68,21 +68,25 @@ set_blocking (int fd, int should_block)
 int main(int argc, char **argv)
 {
 	int fd, n;
-	const char *portname = "/dev/ttyUSB1";
+	const char *portname = "/dev/ttyACM13";
 	char buf[255];
 
 	fd = open (portname, O_RDWR | O_NOCTTY | O_SYNC);
 	if (fd < 0)
 	{
-		//fprintf "stderr, "error %d opening %s: %s", errno, portname, strerror (errno));
+		fprintf(stderr, "error %d opening %s: %s", errno, portname, strerror (errno));
 		return 0;
 	}
 
-	set_interface_attribs (fd, B115200, 0);  // set speed to 115,200 bps, 8n1 (no parity)
-	set_blocking (fd, 0);
+	set_interface_attribs (fd, B9600, 0);  // set speed to 9600 bps, 8n1 (no parity)
+	set_blocking (fd, 1); //0);
 
-	write (fd, "s", 1);
-
+	buf[0] = 's';
+	buf[1] = '\0';
+	
+	write (fd, buf, 2);
+	usleep(1000);
 	n = read (fd, buf, sizeof buf);
+	printf("%s\n", buf);
 	close(fd);
 }
